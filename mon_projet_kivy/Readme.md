@@ -12,5 +12,6 @@ python -m venv .venv
 
 python -m pip install kivy
 
-3. hello_kivy.py
+3. hello_kivy.py affiche un text dans une widget Label
+4. affiche_aldrin.py affiche une image dans une widget Image
 
