@@ -1,58 +1,51 @@
+'''
+API :
+    name : ISS Location Now
+    description : Current ISS location over Earth (latitude/longitude)
+
+    http://api.open-notify.org/iss-now.json
+    
+    This API return the current location of the ISS.
+    It returns the current latitude and longitude of the space station 
+    with a unix timestamp for the time the location was valid
+    This API takes no inputs.
+
+'''
 import requests
 import json
+import datetime
 
+ # URL de l'API
+url ="http://api.open-notify.org/iss-now.json"
 
-if __name__ == "__main__":
-    print(__name__)
+# Requete GET a l'API
+response = requests.get(url=url)
 
-    # url = "http://api.open-notify.org/page-qui-n-existe-pas"
-    # response = requests.get(url=url)
-    # status_code = response.status_code
-    # print(status_code)
-
-    # URL de l'API
-    url ="http://api.open-notify.org/astros.json"
-
-    # Requete GET a l'API
-    response = requests.get(url=url)
-
-    # Verifier si la rrequete a reussi
-    if response.status_code == 200:
+# Verifier si la rrequete a reussi
+if response.status_code == 200:
  
-        # Recuperer les donnees JSON
-        data = response.json()
-        print(data)
-        # print(type(data))   # <class 'dict'>  
+    # Recuperer les donnees JSON
+    data = response.json()
+    print(data)
+    # print(type(data))   # <class 'dict'>  
 
-    else:
-        print(f"Erreur {response.status_code} lors de la requete")
+    # Mise en forme de la sortie pour lecture du dictionnaire
+    data_str = json.dumps(data, indent=4)
+    print(data_str)
 
+else:
+    print(f"Erreur {response.status_code} lors de la requete")
 
-    print()
-    # Afficher les noms des personnes dans l'espace
-    for person in data['people']:
-        print(f"Le spationaute {person['name']} est a bord du vaisseau {person['craft']}")
+latitude = data['iss_position']['latitude']
+longitude = data['iss_position']['longitude']
+print(f"Position de l'ISS : latitude = {latitude} et longitude = {longitude}")
 
+timestamp = data['timestamp']
+print(f"{timestamp}")
 
-    # Afficher les noms des personsonnes a bord de l'ISS 
-    iss_people = [person['name'] for person in data['people'] if person['craft'] == 'ISS']
-    
-    print("\nLes personnes a bord de l'ISS sont :")
-    for name in iss_people:
-        print(name.upper())
+# Convertir le timestamp en un objet datetime
+date_time = datetime.datetime.fromtimestamp(timestamp)
 
+# Afficher la date et l'heure formatée
+print(date_time.strftime('%Y-%m-%d %H:%M:%S'))
 
-    # Creation d'une table d'occurences (un dictionnaire) pour savoir combien y a t il d'astronautes
-    # par vaisseau spatiale
-    craft_counts = {}   # initialisation du dictionnaire
-
-    for person in data['people']:
-        craft = person['craft']
-        if craft not in craft_counts:
-            craft_counts[craft] = 0
-        craft_counts[craft] += 1
-
-    print()
-    # affichage du nombre de personnes par vaisseau dans l'espace
-    for craft, count in craft_counts.items():
-        print(f"Il y a {count} spationautes a bord de {craft}")
